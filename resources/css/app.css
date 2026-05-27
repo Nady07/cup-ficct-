@@ -1,3 +1,204 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* === Estilos Base Globales === */
+@layer base {
+    :root {
+        color-scheme: light;
+    }
+
+    html.dark {
+        color-scheme: dark;
+    }
+
+    body {
+        @apply transition-colors duration-200;
+    }
+
+    /* Scrollbar personalizado */
+    ::-webkit-scrollbar {
+        @apply w-2 h-2;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-gray-100 dark:bg-dark-surface;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-ficct-blue dark:bg-ficct-gold rounded-full;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-ficct-dark-blue dark:bg-ficct-dark-gold;
+    }
+
+    /* Enlaces por defecto */
+    a {
+        @apply transition-colors duration-200;
+    }
+}
+
+/* === Componentes Reutilizables === */
+@layer components {
+    /* Botones */
+    .btn-primary {
+        @apply px-4 py-2 bg-ficct-blue hover:bg-ficct-dark-blue text-white font-semibold rounded-lg transition-all duration-200 active:scale-95;
+    }
+
+    .btn-primary-dark {
+        @apply dark:bg-ficct-dark-blue dark:hover:bg-ficct-light-blue;
+    }
+
+    .btn-secondary {
+        @apply px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-dark-border dark:hover:bg-dark-border text-gray-800 dark:text-white font-semibold rounded-lg transition-all duration-200;
+    }
+
+    /* Cards */
+    .card {
+        @apply bg-white dark:bg-dark-surface rounded-lg shadow-md dark:shadow-lg border border-gray-200 dark:border-dark-border p-6 transition-all duration-200;
+    }
+
+    .card-hover {
+        @apply hover:shadow-lg dark:hover:shadow-2xl hover:scale-105;
+    }
+
+    /* Headers */
+    .section-header {
+        @apply text-2xl font-bold text-gray-900 dark:text-white mb-6;
+    }
+
+    .section-subheader {
+        @apply text-lg font-semibold text-gray-800 dark:text-gray-200;
+    }
+
+    /* Badges */
+    .badge-ficct {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-ficct-blue bg-opacity-20 text-ficct-blue dark:bg-ficct-dark-blue dark:bg-opacity-30 dark:text-ficct-light-blue;
+    }
+
+    /* Tablas */
+    .table-responsive {
+        @apply overflow-x-auto;
+    }
+
+    .table-row-hover {
+        @apply hover:bg-gray-50 dark:hover:bg-dark-surface transition-colors;
+    }
+
+    /* Input/Form */
+    .input-ficct {
+        @apply w-full px-4 py-2 border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ficct-blue dark:focus:ring-ficct-gold focus:border-transparent transition-all duration-200;
+    }
+
+    /* Grid */
+    .grid-responsive {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+    }
+
+    .grid-responsive-4 {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+    }
+}
+
+/* === Animaciones Personalizadas === */
+@layer utilities {
+    /* Fade in */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Pulse suave */
+    @keyframes pulse-soft {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.8;
+        }
+    }
+
+    .animate-pulse-soft {
+        animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Slide */
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .animate-slide-in-left {
+        animation: slideInLeft 0.3s ease-out;
+    }
+}
+
+/* === Tema Oscuro Mejorado === */
+@layer utilities {
+    .dark {
+        color-scheme: dark;
+    }
+
+    /* Fondos para tema oscuro */
+    .dark-gradient {
+        @apply bg-gradient-to-br from-dark-bg to-dark-surface;
+    }
+
+    /* Texto mejorado en tema oscuro */
+    .text-dark-primary {
+        @apply dark:text-slate-200;
+    }
+
+    .text-dark-secondary {
+        @apply dark:text-slate-400;
+    }
+
+    /* Bordes mejorados */
+    .border-dark-subtle {
+        @apply border-gray-200 dark:border-slate-700;
+    }
+}
+
+/* === Estilos Específicos === */
+
+/* Navbar */
+nav {
+    @apply transition-colors duration-200;
+}
+
+/* Footer */
+footer {
+    @apply bg-ficct-dark-blue dark:bg-dark-surface text-white;
+}
+
+/* Página principal */
+body {
+    @apply bg-white dark:bg-dark-bg;
+}
+
+/* Main content */
+main {
+    @apply transition-colors duration-200;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    @apply transition-colors duration-200;
+}

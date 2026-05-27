@@ -154,4 +154,58 @@ class EstudianteController extends Controller
 
         return view('estudiante.cup-info', compact('materiasCup', 'requisitosPorMateria'));
     }
+
+    public function edit(Estudiante $estudiante)
+{
+    $carreras = Carrera::where('estado', true)->get();
+    $grupos = Grupo::with('docente')->where('estado', true)->get();
+    return view('admin.estudiantes.edit', compact('estudiante', 'carreras', 'grupos'));
+}
+
+public function update(Request $request, Estudiante $estudiante)
+{
+    $validated = $request->validate([
+        'nombre' => 'required|string|max:100',
+        'apellidos' => 'required|string|max:100',
+        'ci' => 'required|string|max:20|unique:estudiantes,ci,' . $estudiante->id,
+        'email' => 'required|email|unique:estudiantes,email,' . $estudiante->id,
+        'telefono' => 'nullable|string|max:20',
+        'direccion' => 'nullable|string',
+        'fecha_nacimiento' => 'required|date',
+        'colegio_procedencia' => 'nullable|string|max:200',
+        'anio_graduacion' => 'nullable|integer',
+        'carrera_interes_id' => 'nullable|exists:carreras,id',
+        'estado' => 'boolean',
+    ]);
+
+    $estudiante->update($validated);
+
+    // Si también actualiza la inscripción
+    if ($request->filled('grupo_id')) {
+        $inscripcion = $estudiante->inscripcion;
+        if ($inscripcion) {
+            $inscripcion->update([
+                'grupo_id' => $request->grupo_id,
+                'estado' => $request->inscripcion_estado ?? $inscripcion->estado,
+                'monto_pagado' => $request->monto_pagado,
+                'numero_boleta' => $request->numero_boleta,
+            ]);
+        }
+    }
+
+    return redirect()->route('admin.estudiantes.show', $estudiante)
+        ->with('success', 'Estudiante actualizado exitosamente.');
+}
+
+public function updateRequisitos(Request $request, Estudiante $estudiante)
+{
+    $inscripcion = $estudiante->inscripcion;
+    if ($inscripcion) {
+        $inscripcion->update([
+            'requisitos_completos' => $request->requisitos_completos ?? false,
+        ]);
+    }
+
+    return back()->with('success', 'Requisitos actualizados.');
+}
 }

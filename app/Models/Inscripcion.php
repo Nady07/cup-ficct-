@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Inscripcion extends Model
 {
@@ -14,12 +13,14 @@ class Inscripcion extends Model
         'comprobante_pago', 'monto_pagado', 'numero_boleta', 'requisitos_completos'
     ];
 
-    public function estudiante(): BelongsTo
+    // Relación con Estudiante
+    public function estudiante()
     {
         return $this->belongsTo(Estudiante::class);
     }
 
-    public function grupo(): BelongsTo
+    // Relación con Grupo
+    public function grupo()
     {
         return $this->belongsTo(Grupo::class);
     }

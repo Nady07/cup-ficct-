@@ -21,8 +21,8 @@ class DashboardController extends Controller
             'inscripciones_pendientes' => Inscripcion::where('estado', 'pendiente')->count(),
             'inscripciones_confirmadas' => Inscripcion::where('estado', 'confirmado')->count(),
             'docentes' => Docente::count(),
-            'materias' => MateriaCup::count(),
-            'carreras' => Carrera::count(),
+            'materias' => MateriaCup::where('estado', true)->count(),
+            'carreras' => Carrera::where('estado', true)->count(),
             'grupos_disponibles' => Grupo::whereColumn('estudiantes_inscritos', '<', 'capacidad_maxima')->count(),
             'grupos_llenos' => Grupo::whereColumn('estudiantes_inscritos', '>=', 'capacidad_maxima')->count(),
         ];

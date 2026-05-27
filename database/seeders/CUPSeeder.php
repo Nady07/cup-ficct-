@@ -55,6 +55,8 @@ class CUPSeeder extends Seeder
                 'valor_puntaje' => 25.00,
                 'orden' => 1,
                 'estado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'nombre' => 'Física',
