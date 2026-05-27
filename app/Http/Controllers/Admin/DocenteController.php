@@ -7,6 +7,7 @@ use App\Models\Docente;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 USE App\Models\RequisitoCup;
 use App\Models\DocenteRequisito;
 
@@ -52,11 +53,14 @@ public function index(Request $request)
             'experiencia' => 'nullable|string',
         ]);
 
+        // Generar contraseña temporal aleatoria segura
+        $passwordTemporal = Str::random(12);
+        
         // Crear usuario para el docente
         $user = User::create([
             'name' => $validated['nombre'] . ' ' . $validated['apellidos'],
             'email' => $validated['email'],
-            'password' => Hash::make('docente123'),
+            'password' => Hash::make($passwordTemporal),
             'role' => 'docente',
         ]);
 
@@ -73,7 +77,7 @@ public function index(Request $request)
         ]);
 
         return redirect()->route('admin.docentes.index')
-            ->with('success', 'Docente creado exitosamente. Contraseña por defecto: docente123');
+            ->with('success', "Docente creado exitosamente. Contraseña temporal enviada al email: {$validated['email']}");
     }
 
     public function show(Docente $docente)
