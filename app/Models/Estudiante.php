@@ -98,4 +98,9 @@ class Estudiante extends Model
     {
         return $this->apellidos . ' ' . $this->nombre;
     }
+    // En Estudiante.php
+    public function requisitosEnviados()
+    {
+        return $this->hasMany(EstudianteRequisito::class);
+    }
 }

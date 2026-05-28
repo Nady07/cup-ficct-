@@ -12,24 +12,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws ValidationException
-     */
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -37,7 +28,16 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:estudiante,docente'],
-            'ci' => ['required', 'string', 'max:20'], // ← AÑADIDO
+            'ci' => ['required', 'string', 'max:20', 'unique:estudiantes,ci'],
+            'fecha_nacimiento' => ['required', 'date'],
+            'sexo' => ['nullable', 'in:M,F,O'],
+            'telefono' => ['nullable', 'string', 'max:20'],
+            'direccion' => ['nullable', 'string', 'max:500'],
+            'ciudad' => ['nullable', 'string', 'max:100'],
+            'colegio_procedencia' => ['required', 'string', 'max:200'],
+            'anio_graduacion' => ['required', 'integer', 'min:2000', 'max:2030'],
+            'carrera_interes_id' => ['required', 'exists:carreras,id'],
+            'carrera_opcion2_id' => ['nullable', 'exists:carreras,id'],
         ]);
 
         $user = User::create([
@@ -47,22 +47,29 @@ class RegisteredUserController extends Controller
             'role' => $request->role,
         ]);
 
-        // Crear perfil según el rol
         if ($request->role === 'estudiante') {
             Estudiante::create([
                 'user_id' => $user->id,
-                'ci' => $request->ci,           // ← AÑADIDO
+                'ci' => $request->ci,
                 'nombre' => $request->name,
                 'apellidos' => '',
                 'email' => $request->email,
-                'fecha_nacimiento' => now()->subYears(18),
+                'fecha_nacimiento' => $request->fecha_nacimiento,
+                'sexo' => $request->sexo,
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+                'ciudad' => $request->ciudad,
+                'colegio_procedencia' => $request->colegio_procedencia,
+                'anio_graduacion' => $request->anio_graduacion,
+                'carrera_interes_id' => $request->carrera_interes_id,
+                'carrera_opcion2_id' => $request->carrera_opcion2_id,
                 'estado_flujo' => 'postulante',
                 'estado' => true,
             ]);
         } elseif ($request->role === 'docente') {
             Docente::create([
                 'user_id' => $user->id,
-                'ci' => $request->ci,           // ← AÑADIDO
+                'ci' => $request->ci,
                 'nombre' => $request->name,
                 'apellidos' => '',
                 'email' => $request->email,
@@ -74,6 +81,8 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        return redirect()->route($request->role === 'estudiante' ? 'estudiante.dashboard' : 'docente.dashboard');
+        return redirect()->route(
+            $request->role === 'estudiante' ? 'estudiante.dashboard' : 'docente.dashboard'
+        );
     }
 }

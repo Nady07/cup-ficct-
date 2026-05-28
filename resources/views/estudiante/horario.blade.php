@@ -1,86 +1,120 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Mi Horario de Clases</h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">Vista de tus clases por turno</p>
-    </x-slot>
+@extends('layouts.estudiante')
 
-    <div class="py-12 bg-gray-50 dark:bg-dark-bg min-h-screen">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            @forelse($turnos as $turno => $gruposDelTurno)
-                <div class="mb-12">
-                    <div class="mb-6">
-                        <h3 class="text-2xl font-bold text-ficct-blue dark:text-ficct-gold mb-1">
-                            Turno: {{ ucfirst($turno) }}
-                        </h3>
-                        <div class="h-1 w-20 bg-ficct-blue dark:bg-ficct-gold rounded"></div>
-                    </div>
+@section('title', 'Horario')
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach($gruposDelTurno as $grupo)
-                            <div class="bg-white dark:bg-dark-surface rounded-lg shadow-md dark:shadow-lg border-l-4 border-ficct-blue dark:border-ficct-gold p-6 hover:shadow-lg transition-all">
-                                <div class="mb-4">
-                                    <h4 class="text-xl font-bold text-gray-900 dark:text-white">
-                                        {{ $grupo->codigo }}
-                                    </h4>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Grupo de la materia</p>
-                                </div>
+@section('content')
+<div class="max-w-4xl mx-auto space-y-6">
+    @php 
+        $e = auth()->user()->estudiante;
+        $flujo = $e->estado_flujo ?? 'postulante';
+    @endphp
 
-                                <div class="space-y-3 py-4 border-y border-gray-200 dark:border-dark-border">
-                                    <div class="flex items-center space-x-3">
-                                        <svg class="w-5 h-5 text-ficct-blue dark:text-ficct-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        <div>
-                                            <p class="text-sm text-gray-600 dark:text-gray-400">Horario</p>
-                                            <p class="font-semibold text-gray-900 dark:text-white">
-                                                {{ $grupo->horario_inicio }} - {{ $grupo->horario_fin }}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    @if($grupo->docente)
-                                        <div class="flex items-center space-x-3">
-                                            <svg class="w-5 h-5 text-ficct-blue dark:text-ficct-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM9 6v12h6V6a3 3 0 11-6 0z"></path>
-                                            </svg>
-                                            <div>
-                                                <p class="text-sm text-gray-600 dark:text-gray-400">Docente</p>
-                                                <p class="font-semibold text-gray-900 dark:text-white">
-                                                    {{ $grupo->docente->nombre }} {{ $grupo->docente->apellidos }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    <div class="flex items-center space-x-3">
-                                        <svg class="w-5 h-5 text-ficct-blue dark:text-ficct-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        <div>
-                                            <p class="text-sm text-gray-600 dark:text-gray-400">Capacidad</p>
-                                            <p class="font-semibold text-gray-900 dark:text-white">
-                                                {{ $grupo->estudiantes_inscritos }}/{{ $grupo->capacidad_maxima }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mt-4">
-                                    <x-status-badge :status="$grupo->estado" />
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @empty
-                <div class="bg-white dark:bg-dark-surface rounded-lg shadow-md dark:shadow-lg p-8 text-center border border-gray-200 dark:border-dark-border">
-                    <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No hay clases</h3>
-                    <p class="text-gray-600 dark:text-gray-400">No tienes inscripciones activas en este momento</p>
-                </div>
-            @endforelse
-        </div>
+    {{-- Header --}}
+    <div>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Mi Horario</h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Grupo, materias y horario de clases</p>
     </div>
-</x-app-layout>
+
+    {{-- Solo visible si está inscrito --}}
+    @if(in_array($flujo, ['inscrito', 'cup_aprobado']) && $e->inscripcion)
+        @php $grupo = $e->inscripcion->grupo; @endphp
+        
+        {{-- Datos del grupo --}}
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
+            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Mi Grupo</h3>
+            </div>
+            <div class="p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="bg-slate-50 dark:bg-slate-900/30 rounded-xl p-4 text-center border border-slate-200 dark:border-slate-800">
+                        <svg class="w-5 h-5 mx-auto text-blue-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                        <p class="text-[10px] text-gray-400 uppercase">Código</p>
+                        <p class="text-lg font-mono font-bold text-gray-900 dark:text-white">{{ $grupo->codigo ?? '—' }}</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-900/30 rounded-xl p-4 text-center border border-slate-200 dark:border-slate-800">
+                        <svg class="w-5 h-5 mx-auto text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-[10px] text-gray-400 uppercase">Horario</p>
+                        <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $grupo->horario_inicio ?? '—' }} - {{ $grupo->horario_fin ?? '—' }}</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-900/30 rounded-xl p-4 text-center border border-slate-200 dark:border-slate-800">
+                        <svg class="w-5 h-5 mx-auto text-amber-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        <p class="text-[10px] text-gray-400 uppercase">Turno</p>
+                        <p class="text-sm font-bold text-gray-900 dark:text-white">
+                            {{ $grupo->turno === 'M' ? 'Mañana' : ($grupo->turno === 'T' ? 'Tarde' : 'Noche') }}
+                        </p>
+                    </div>
+                </div>
+                
+                {{-- Docente --}}
+                @if($grupo->docente)
+                <div class="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-sm font-bold text-blue-600 shadow-sm">
+                            {{ strtoupper(substr($grupo->docente->nombre ?? 'D', 0, 1)) }}
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $grupo->docente->apellidos ?? '' }} {{ $grupo->docente->nombre ?? '' }}</p>
+                            <p class="text-xs text-gray-500">{{ $grupo->docente->especialidad ?? 'Docente CUP' }}</p>
+                            <p class="text-[10px] text-gray-400 mt-0.5">{{ $grupo->docente->email ?? '' }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Las 4 materias --}}
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
+            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Materias del CUP</h3>
+                <p class="text-[10px] text-gray-400 mt-0.5">4 materias obligatorias · 3 exámenes por materia · Mínimo 60 pts</p>
+            </div>
+            <div class="p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    @foreach(\App\Models\MateriaCup::where('estado', true)->orderBy('orden')->get() as $materia)
+                        @php $cal = $e->calificaciones->where('materia_id', $materia->id)->first(); @endphp
+                        <div class="p-4 rounded-xl border transition-all hover:shadow-md
+                            {{ $cal ? ($cal->estado === 'aprobado' ? 'border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20' : 'border-red-200 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/20 dark:to-rose-950/20') : 'border-gray-200 bg-slate-50 dark:bg-slate-900/30 dark:border-slate-800' }}">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $materia->nombre }}</p>
+                                    <p class="text-[10px] text-gray-400">{{ $materia->codigo }} · {{ $materia->valor_puntaje }} pts</p>
+                                </div>
+                                @if($cal)
+                                    <div class="text-right">
+                                        <span class="text-lg font-bold {{ $cal->estado === 'aprobado' ? 'text-green-600' : 'text-red-600' }}">
+                                            {{ $cal->promedio_formateado }}
+                                        </span>
+                                        <p class="text-[10px] {{ $cal->estado === 'aprobado' ? 'text-green-500' : 'text-red-500' }}">
+                                            {{ $cal->estado === 'aprobado' ? 'Aprobado' : 'Reprobado' }}
+                                        </p>
+                                    </div>
+                                @else
+                                    <span class="text-xs text-gray-400">Sin notas</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+    @elseif($flujo === 'pago_confirmado')
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-12 text-center">
+            <div class="w-16 h-16 mx-auto bg-amber-50 dark:bg-amber-950/20 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Pronto se te asignará un grupo</h3>
+            <p class="text-sm text-gray-500">Tu pago ha sido confirmado. El administrador te asignará un grupo y horario pronto.</p>
+        </div>
+    @else
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-12 text-center">
+            <div class="w-16 h-16 mx-auto bg-slate-50 dark:bg-slate-900/30 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Completa tu postulación</h3>
+            <p class="text-sm text-gray-500">Debes completar los requisitos y el pago para que se te asigne un grupo y horario.</p>
+        </div>
+    @endif
+</div>
+@endsection

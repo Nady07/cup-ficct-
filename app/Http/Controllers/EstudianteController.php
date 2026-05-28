@@ -10,6 +10,10 @@ use App\Models\Docente;
 use App\Models\MateriaCup;
 use App\Models\RequisitoCup;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class EstudianteController extends Controller
 {
@@ -21,6 +25,7 @@ class EstudianteController extends Controller
      */
     public function dashboard()
     {
+        
         $user = Auth::user();
         $estudiante = Estudiante::where('user_id', $user->id)->first();
 
@@ -121,8 +126,9 @@ class EstudianteController extends Controller
     public function docentes()
     {
         $user = Auth::user();
-        $estudiante = Estudiante::where('user_id', $user->id)->first();
-
+        $estudiante = Estudiante::where('user_id', auth()->id())
+        ->with(['carreraInteres', 'carreraOpcion2', 'inscripcion.grupo', 'calificaciones.materia'])
+        ->first();
         if (!$estudiante) {
             abort(404);
         }
@@ -156,4 +162,89 @@ class EstudianteController extends Controller
 
         return view('estudiante.cup-info', compact('materiasCup', 'requisitos'));
     }
+public function uploadRequisito(Request $request)
+{
+    $request->validate([
+        'requisito_id' => 'required|exists:requisitos_cup,id',
+        'archivo' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    ]);
+
+    $estudiante = auth()->user()->estudiante;
+    
+    // Guardar archivo
+    $path = $request->file('archivo')->store('requisitos/' . $estudiante->id, 'public');
+
+    // Marcar que subió al menos un documento (pendiente de revisión)
+    $estudiante->update([
+        'requisitos_completos' => false, // Aún no aprobado, solo subido
+        'estado_flujo' => 'postulante', // Se mantiene como postulante hasta que admin apruebe
+    ]);
+
+    return back()->with('success', 'Documento subido correctamente. Pendiente de revisión.');
+}
+public function updatePerfil(Request $request)
+{
+    $estudiante = auth()->user()->estudiante;
+    
+    $validated = $request->validate([
+        'nombre' => 'required|string|max:100',
+        'apellidos' => 'nullable|string|max:100',
+        'ci' => 'required|string|max:20|unique:estudiantes,ci,' . $estudiante->id,
+        'fecha_nacimiento' => 'required|date',
+        'sexo' => 'nullable|in:M,F,O',
+        'email' => 'required|email|unique:estudiantes,email,' . $estudiante->id,
+        'telefono' => 'nullable|string|max:20',
+        'direccion' => 'nullable|string|max:500',
+        'ciudad' => 'nullable|string|max:100',
+        'colegio_procedencia' => 'required|string|max:200',
+        'anio_graduacion' => 'required|integer|min:2000|max:2030',
+        'carrera_interes_id' => 'required|exists:carreras,id',
+        'carrera_opcion2_id' => 'nullable|exists:carreras,id',
+        'modalidad' => 'nullable|in:presencial,virtual,hibrido',
+        'es_extranjero' => 'nullable|boolean',
+        'documento_extranjero' => 'nullable|string|max:50',
+        'password_actual' => 'nullable|string',
+        'password' => 'nullable|string|min:8|confirmed',
+    ]);
+
+    // Cambiar contraseña si se proporcionó
+    if ($request->filled('password_actual')) {
+        if (!Hash::check($request->password_actual, auth()->user()->password)) {
+            return back()->with('error', 'La contraseña actual es incorrecta.');
+        }
+        auth()->user()->update(['password' => Hash::make($request->password)]);
+        unset($validated['password_actual'], $validated['password'], $validated['password_confirmation']);
+    } else {
+        unset($validated['password_actual'], $validated['password'], $validated['password_confirmation']);
+    }
+
+    $estudiante->update($validated);
+
+    return back()->with('success', 'Perfil actualizado correctamente.');
+}
+public function uploadPago(Request $request)
+{
+    $request->validate([
+        'comprobante' => 'required|file|mimes:pdf,jpg,png|max:2048',
+    ]);
+
+    $estudiante = auth()->user()->estudiante;
+    $path = $request->file('comprobante')->store('pagos/' . $estudiante->id, 'public');
+
+    $estudiante->update([
+        'comprobante_pago_path' => $path,
+        'estado_flujo' => 'pago_confirmado',
+        'fecha_pago' => now(),
+    ]);
+
+    return back()->with('success', 'Comprobante de pago subido correctamente. Espera la confirmación del administrador.');
+}
+
+public function pago()
+{
+    $estudiante = auth()->user()->estudiante;
+    $config = \App\Models\ConfiguracionPago::getActiva();
+    
+    return view('estudiante.pago', compact('estudiante', 'config'));
+}
 }

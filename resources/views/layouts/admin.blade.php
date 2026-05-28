@@ -38,95 +38,88 @@
 
             {{-- Navegación --}}
             <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+                
+                {{-- ═══════════════ MENÚ PRINCIPAL ═══════════════ --}}
+                @php
+                    $menu = [
+                        ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'url' => route('admin.dashboard'), 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
+                    ];
+                    
+                    $secciones = [
+                        'Académico' => [
+                            ['label' => 'Materias', 'route' => 'admin.materias.*', 'url' => route('admin.materias.index'), 'icon' => 'M12 6.253v13...'],
+                            ['label' => 'Grupos', 'route' => 'admin.grupos.*', 'url' => route('admin.grupos.index'), 'icon' => 'M19 11H5...'],
+                            ['label' => 'Calificaciones', 'route' => 'admin.calificaciones.*', 'url' => route('admin.calificaciones.index'), 'icon' => 'M9 19v-6...'],
+                        ],
+                        'Personas' => [
+                            ['label' => 'Docentes', 'route' => 'admin.docentes.*', 'url' => route('admin.docentes.index'), 'icon' => 'M16 7a4...', 'submenu' => [
+                                ['label' => 'Aprobados', 'route' => 'admin.docentes.index'],
+                                ['label' => 'Postulantes', 'route' => 'admin.docentes.postulantes', 'badge' => \App\Models\Docente::whereIn('estado_postulacion', ['pendiente', 'en_revision'])->count()],
+                            ]],
+                            ['label' => 'Estudiantes', 'route' => 'admin.estudiantes.*', 'url' => route('admin.estudiantes.index'), 'icon' => 'M17 20h5v-2...', 'submenu' => [
+                                ['label' => 'Inscritos', 'route' => 'admin.estudiantes.index'],
+                                ['label' => 'Postulantes', 'route' => 'admin.estudiantes.postulantes', 'badge' => \App\Models\Estudiante::whereIn('estado_flujo', ['postulante', 'requisitos_aprobados'])->count()],
+                            ]],
+                        ],
+                        'Administración' => [
+                            ['label' => 'Inscripciones', 'route' => 'admin.inscripciones.*', 'url' => route('admin.inscripciones.index'), 'icon' => 'M9 12h6...'],
+                            ['label' => 'Carreras', 'route' => 'admin.carreras.*', 'url' => route('admin.carreras.index'), 'icon' => 'M19 21V5...'],
+                            ['label' => 'Requisitos', 'route' => 'admin.requisitos.*', 'url' => route('admin.requisitos.index'), 'icon' => 'M9 5H7...'],
+                        ],
+                        'Reportes' => [
+                            ['label' => 'Reportes', 'route' => 'admin.reportes.*', 'url' => route('admin.reportes.postulantes'), 'icon' => 'M9 17v-2...'],
+                        ],
+                    ];
+                @endphp
+
                 {{-- Dashboard --}}
-                <a href="{{ route('admin.dashboard') }}" 
+                <a href="{{ $menu[0]['url'] }}" 
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                          {{ request()->routeIs('admin.dashboard') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    <span x-show="sidebarOpen" class="truncate">Dashboard</span>
+                          {{ request()->routeIs($menu[0]['route']) ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $menu[0]['icon'] }}"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">{{ $menu[0]['label'] }}</span>
                 </a>
 
-                {{-- Postulaciones --}}
-                <div x-show="sidebarOpen" class="pt-3 pb-1">
-                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Postulaciones</p>
-                </div>
-
-                <a href="{{ route('admin.estudiantes.postulantes') }}" 
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                          {{ request()->routeIs('admin.estudiantes.postulantes') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span x-show="sidebarOpen" class="truncate">Estudiantes</span>
-                    @php $pE = \App\Models\Estudiante::whereIn('estado_flujo', ['postulante', 'requisitos_aprobados'])->count(); @endphp
-                    @if($pE > 0)<span class="ml-auto bg-amber-400 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $pE }}</span>@endif
-                </a>
-
-                <a href="{{ route('admin.docentes.postulantes') }}" 
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                          {{ request()->routeIs('admin.docentes.postulantes') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    <span x-show="sidebarOpen" class="truncate">Docentes</span>
-                    @php $pD = \App\Models\Docente::whereIn('estado_postulacion', ['pendiente', 'en_revision'])->count(); @endphp
-                    @if($pD > 0)<span class="ml-auto bg-amber-400 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $pD }}</span>@endif
-                </a>
-
-                {{-- Académico --}}
-                <div x-show="sidebarOpen" class="pt-3 pb-1">
-                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Académico</p>
-                </div>
-
-                @foreach([['route'=>'admin.materias.*','url'=>route('admin.materias.index'),'icon'=>'M12 6.253v13...','label'=>'Materias'],['route'=>'admin.grupos.*','url'=>route('admin.grupos.index'),'icon'=>'M19 11H5...','label'=>'Grupos'],['route'=>'admin.calificaciones.*','url'=>route('admin.calificaciones.index'),'icon'=>'M9 19v-6...','label'=>'Calificaciones']] as $item)
-                <a href="{{ $item['url'] }}" 
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                          {{ request()->routeIs($item['route']) ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $item['icon'] }}"/></svg>
-                    <span x-show="sidebarOpen" class="truncate">{{ $item['label'] }}</span>
-                </a>
+                {{-- Secciones dinámicas --}}
+                @foreach($secciones as $titulo => $items)
+                    <div x-show="sidebarOpen" class="pt-3 pb-1">
+                        <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">{{ $titulo }}</p>
+                    </div>
+                    
+                    @foreach($items as $item)
+                        {{-- Si tiene submenú, mostrar como dropdown simple --}}
+                        @if(isset($item['submenu']))
+                            <div x-data="{ open: {{ request()->routeIs($item['route']) ? 'true' : 'false' }} }">
+                                <button @click="open = !open" 
+                                        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                                               {{ request()->routeIs($item['route']) ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $item['icon'] }}"/></svg>
+                                    <span x-show="sidebarOpen" class="truncate flex-1 text-left">{{ $item['label'] }}</span>
+                                    <svg x-show="sidebarOpen" :class="open ? 'rotate-90' : ''" class="w-3 h-3 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </button>
+                                <div x-show="open && sidebarOpen" x-transition class="ml-8 mt-1 space-y-1">
+                                    @foreach($item['submenu'] as $sub)
+                                        <a href="{{ route($sub['route']) }}" 
+                                           class="block px-3 py-1.5 rounded-lg text-xs transition-colors
+                                                  {{ request()->routeIs($sub['route']) ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white' }}">
+                                            {{ $sub['label'] }}
+                                            @if(isset($sub['badge']) && $sub['badge'] > 0)
+                                                <span class="ml-1 bg-amber-400 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $sub['badge'] }}</span>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            <a href="{{ $item['url'] }}" 
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                                      {{ request()->routeIs($item['route']) ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $item['icon'] }}"/></svg>
+                                <span x-show="sidebarOpen" class="truncate">{{ $item['label'] }}</span>
+                            </a>
+                        @endif
+                    @endforeach
                 @endforeach
-
-                {{-- Aprobados --}}
-                <div x-show="sidebarOpen" class="pt-3 pb-1">
-                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Aprobados</p>
-                </div>
-
-                <a href="{{ route('admin.docentes.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                          {{ request()->routeIs('admin.docentes.*') && !request()->routeIs('admin.docentes.postulantes') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    <span x-show="sidebarOpen" class="truncate">Docentes</span>
-                </a>
-
-                <a href="{{ route('admin.estudiantes.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                          {{ request()->routeIs('admin.estudiantes.*') && !request()->routeIs('admin.estudiantes.postulantes') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span x-show="sidebarOpen" class="truncate">Estudiantes</span>
-                </a>
-
-                {{-- Admin --}}
-                <div x-show="sidebarOpen" class="pt-3 pb-1">
-                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Admin</p>
-                </div>
-
-                @foreach([['route'=>'admin.inscripciones.*','url'=>route('admin.inscripciones.index'),'icon'=>'M9 12h6...','label'=>'Inscripciones'],['route'=>'admin.carreras.*','url'=>route('admin.carreras.index'),'icon'=>'M19 21V5...','label'=>'Carreras'],['route'=>'admin.requisitos.*','url'=>route('admin.requisitos.index'),'icon'=>'M9 5H7...','label'=>'Requisitos']] as $item)
-                <a href="{{ $item['url'] }}" 
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                          {{ request()->routeIs($item['route']) ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $item['icon'] }}"/></svg>
-                    <span x-show="sidebarOpen" class="truncate">{{ $item['label'] }}</span>
-                </a>
-                @endforeach
-
-                {{-- Reportes --}}
-                <div x-show="sidebarOpen" class="pt-3 pb-1">
-                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Reportes</p>
-                </div>
-
-                <a href="{{ route('admin.reportes.postulantes') }}" 
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                          {{ request()->routeIs('admin.reportes.*') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span x-show="sidebarOpen" class="truncate">Reportes</span>
-                </a>
             </nav>
 
             {{-- Footer --}}
@@ -172,20 +165,20 @@
 
             <div class="flex-1 overflow-y-auto p-6">
                 @if(session('success'))
-                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-xl flex justify-between items-center text-sm">
+                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-lg flex justify-between items-center text-xs">
                         <span>{{ session('success') }}</span>
                         <button @click="show = false" class="text-emerald-500 hover:text-emerald-700">&times;</button>
                     </div>
                 @endif
                 @if(session('error'))
-                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl flex justify-between items-center text-sm">
+                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg flex justify-between items-center text-xs">
                         <span>{{ session('error') }}</span>
                         <button @click="show = false" class="text-red-500 hover:text-red-700">&times;</button>
                     </div>
                 @endif
                 @if($errors->any())
-                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl text-sm">
-                        <ul class="list-disc list-inside space-y-1">
+                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg text-xs">
+                        <ul class="list-disc list-inside space-y-0.5">
                             @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
                         </ul>
                     </div>
