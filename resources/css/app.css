@@ -2,132 +2,230 @@
 @tailwind components;
 @tailwind utilities;
 
-/* === Estilos Base Globales === */
+/* ═══════════════════════════════════════════════ */
+/* VARIABLES FICCT - IDENTIDAD ACADÉMICA         */
+/* ═══════════════════════════════════════════════ */
+:root {
+    --ficct-primary: #1a56db;
+    --ficct-primary-dark: #1e3a8a;
+    --ficct-primary-light: #3b82f6;
+    --ficct-accent: #f59e0b;
+    --ficct-accent-dark: #b45309;
+    --ficct-success: #059669;
+    --ficct-danger: #dc2626;
+    --ficct-warning: #d97706;
+}
+
+/* ═══════════════════════════════════════════════ */
+/* ESTILOS BASE                                     */
+/* ═══════════════════════════════════════════════ */
 @layer base {
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .animate-fade-in {
-        animation: fadeIn 0.3s ease-out;
-    }
-
-    :root {
-        color-scheme: light;
-    }
-
-    html.dark {
-        color-scheme: dark;
+    * {
+        @apply border-gray-200 dark:border-gray-800;
     }
 
     body {
-        @apply transition-colors duration-200;
+        @apply bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     }
 
-    /* Scrollbar personalizado */
+    /* Scrollbar elegante FICCT */
     ::-webkit-scrollbar {
-        @apply w-2 h-2;
+        @apply w-1.5 h-1.5;
     }
 
     ::-webkit-scrollbar-track {
-        @apply bg-gray-100 dark:bg-dark-surface;
+        @apply bg-transparent;
     }
 
     ::-webkit-scrollbar-thumb {
-        @apply bg-ficct-blue dark:bg-ficct-gold rounded-full;
+        @apply bg-gray-300 dark:bg-gray-700 rounded-full;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        @apply bg-ficct-dark-blue dark:bg-ficct-dark-gold;
+        @apply bg-gray-400 dark:bg-gray-600;
     }
 
-    /* Enlaces por defecto */
-    a {
-        @apply transition-colors duration-200;
+    /* Animaciones base */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    .animate-slide-up { animation: slideUp 0.4s ease-out; }
+    .animate-scale-in { animation: scaleIn 0.2s ease-out; }
 }
 
-/* === Componentes Reutilizables === */
+/* ═══════════════════════════════════════════════ */
+/* COMPONENTES REUTILIZABLES                        */
+/* ═══════════════════════════════════════════════ */
 @layer components {
-    /* Botones */
+    /* Botón primario FICCT */
     .btn-primary {
-        @apply px-4 py-2 bg-ficct-blue hover:bg-ficct-dark-blue text-white font-semibold rounded-lg transition-all duration-200 active:scale-95;
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 
+               bg-gradient-to-r from-blue-600 to-blue-700 
+               hover:from-blue-700 hover:to-blue-800
+               text-white text-sm font-semibold rounded-xl 
+               shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30
+               transition-all duration-200 active:scale-[0.98]
+               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900;
     }
 
+    /* Botón secundario */
     .btn-secondary {
-        @apply px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-dark-border dark:hover:bg-dark-border text-gray-800 dark:text-white font-semibold rounded-lg transition-all duration-200;
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
+               bg-white dark:bg-gray-800
+               hover:bg-gray-50 dark:hover:bg-gray-700
+               text-gray-700 dark:text-gray-300 text-sm font-medium rounded-xl
+               border border-gray-200 dark:border-gray-700
+               shadow-sm hover:shadow-md
+               transition-all duration-200 active:scale-[0.98]
+               focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900;
     }
 
-    /* Cards */
+    /* Card académica */
     .card {
-        @apply bg-white dark:bg-dark-surface rounded-lg shadow-md dark:shadow-lg border border-gray-200 dark:border-dark-border p-6 transition-all duration-200;
+        @apply bg-white dark:bg-gray-900 
+               rounded-2xl border border-gray-100 dark:border-gray-800
+               shadow-sm hover:shadow-md
+               transition-all duration-300;
     }
 
-    .card-hover {
-        @apply hover:shadow-lg dark:hover:shadow-2xl hover:scale-105;
+    /* Card con gradiente FICCT */
+    .card-ficct {
+        @apply card relative overflow-hidden;
+        background: linear-gradient(135deg, rgba(26, 86, 219, 0.03) 0%, rgba(59, 130, 246, 0.01) 100%);
     }
 
-    /* Badges */
-    .badge-ficct {
-        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-ficct-blue bg-opacity-20 text-ficct-blue dark:bg-ficct-dark-blue dark:bg-opacity-30 dark:text-ficct-light-blue;
+    .dark .card-ficct {
+        background: linear-gradient(135deg, rgba(26, 86, 219, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
     }
 
-    /* Input/Form */
+    /* Input FICCT */
     .input-ficct {
-        @apply w-full px-4 py-2 border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ficct-blue dark:focus:ring-ficct-gold focus:border-transparent transition-all duration-200;
+        @apply w-full px-4 py-2.5 text-sm
+               bg-white dark:bg-gray-800
+               border border-gray-200 dark:border-gray-700
+               text-gray-900 dark:text-white
+               rounded-xl
+               placeholder-gray-400 dark:placeholder-gray-500
+               focus:ring-2 focus:ring-blue-500 focus:border-transparent
+               dark:focus:ring-blue-600
+               transition-all duration-200;
     }
 
-    /* Grids */
-    .grid-responsive {
-        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+    /* Badge FICCT */
+    .badge-ficct {
+        @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
+               bg-gradient-to-r from-blue-500/10 to-blue-600/10 
+               text-blue-700 dark:text-blue-300
+               border border-blue-200/50 dark:border-blue-800/50;
     }
 
-    .grid-responsive-4 {
-        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+    /* Skeleton loading */
+    .skeleton {
+        @apply bg-gray-200 dark:bg-gray-800 rounded-lg;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255,255,255,0.4) 50%, 
+            transparent 100%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    /* Separador elegante */
+    .divider {
+        @apply h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent;
     }
 }
 
-/* === Utilidades === */
+/* ═══════════════════════════════════════════════ */
+/* UTILIDADES                                       */
+/* ═══════════════════════════════════════════════ */
 @layer utilities {
+    /* Gradientes FICCT */
+    .bg-ficct-gradient {
+        @apply bg-gradient-to-br from-blue-600 to-blue-800;
+    }
+
+    .bg-ficct-gradient-light {
+        @apply bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900;
+    }
+
+    .text-ficct-gradient {
+        @apply bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent;
+    }
+
+    /* Efecto glass */
+    .glass {
+        @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 dark:border-gray-800/30;
+    }
+
+    /* Texto balanceado */
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    /* Línea decorativa FICCT */
+    .ficct-line {
+        @apply relative;
+    }
+
+    .ficct-line::after {
+        content: '';
+        @apply absolute bottom-0 left-0 w-12 h-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full;
+    }
+
+    /* Ocultar scrollbar pero mantener scroll */
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Pulse suave */
     @keyframes pulse-soft {
         0%, 100% { opacity: 1; }
-        50% { opacity: 0.8; }
+        50% { opacity: 0.7; }
     }
 
     .animate-pulse-soft {
         animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
-
-    @keyframes slideInLeft {
-        from { opacity: 0; transform: translateX(-20px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-
-    .animate-slide-in-left {
-        animation: slideInLeft 0.3s ease-out;
-    }
-
-    /* Fondos para tema oscuro */
-    .dark-gradient {
-        @apply bg-gradient-to-br from-dark-bg to-dark-surface;
-    }
-
-    /* Texto mejorado en tema oscuro */
-    .text-dark-primary {
-        @apply dark:text-slate-200;
-    }
-
-    .text-dark-secondary {
-        @apply dark:text-slate-400;
-    }
 }
 
-/* === Estilos por defecto === */
-body {
-    @apply bg-white dark:bg-dark-bg;
-}
-
+/* ═══════════════════════════════════════════════ */
+/* ESTILOS POR DEFECTO                              */
+/* ═══════════════════════════════════════════════ */
 h1, h2, h3, h4, h5, h6 {
-    @apply transition-colors duration-200;
+    @apply tracking-tight;
+}
+
+/* Focus visible accesible */
+:focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+}
+
+/* Transiciones suaves en enlaces */
+a, button {
+    @apply transition-all duration-200;
 }

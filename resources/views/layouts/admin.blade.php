@@ -1,223 +1,192 @@
 <!DOCTYPE html>
-<html lang="es" x-data="{ 
-    darkMode: localStorage.getItem('darkMode') === 'true',
-    sidebarOpen: true 
-}" :class="darkMode ? 'dark' : ''">
+<html lang="es" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: true }" :class="darkMode ? 'dark' : ''">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') | CUP FICCT I/2025</title>
+    <title>@yield('title', 'Dashboard') | CUP FICCT</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
-        if (localStorage.getItem('darkMode') === 'true' || 
-            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         }
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-white transition-colors duration-200">
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
+        
+        {{-- SIDEBAR --}}
         <aside :class="sidebarOpen ? 'w-64' : 'w-20'" 
-               class="bg-gray-900 dark:bg-dark-surface text-white flex flex-col shadow-xl transition-all duration-300 relative">
-            <!-- Logo -->
-            <div class="p-5 border-b border-gray-700/50 flex items-center justify-between">
-                <div x-show="sidebarOpen">
-                    <h1 class="text-xl font-bold text-ficct-gold">🎓 CUP FICCT</h1>
-                    <p class="text-xs text-gray-400 mt-1">Gestión I/2025</p>
-                </div>
-                <button @click="sidebarOpen = !sidebarOpen" class="text-gray-400 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
+               class="bg-[#0f172a] dark:bg-gray-900 text-white flex flex-col transition-all duration-300 relative z-20 shadow-xl">
+            
+            {{-- Logo --}}
+            <div class="h-16 flex items-center justify-between px-4 border-b border-gray-700/50 dark:border-gray-800">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 min-w-0">
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="text-white font-bold text-sm">C</span>
+                    </div>
+                    <div x-show="sidebarOpen" class="min-w-0">
+                        <h1 class="text-sm font-bold text-white truncate">CUP FICCT</h1>
+                        <p class="text-[10px] text-gray-400">I/2025</p>
+                    </div>
+                </a>
+                <button @click="sidebarOpen = !sidebarOpen" 
+                        class="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
             </div>
 
-            <!-- Nav -->
-            <nav class="flex-1 overflow-y-auto py-4 space-y-1">
-                <p x-show="sidebarOpen" class="px-4 text-xs text-gray-500 uppercase tracking-wider mb-2">Principal</p>
+            {{-- Navegación --}}
+            <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+                {{-- Dashboard --}}
                 <a href="{{ route('admin.dashboard') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.dashboard') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Dashboard</span>
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                          {{ request()->routeIs('admin.dashboard') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">Dashboard</span>
                 </a>
 
-                <p x-show="sidebarOpen" class="px-4 text-xs text-gray-500 uppercase tracking-wider mt-4 mb-2">Académico</p>
-                <a href="{{ route('admin.materias.index') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.materias.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Materias</span>
-                </a>
-                <a href="{{ route('admin.grupos.index') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.grupos.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Grupos</span>
-                </a>
-                <a href="{{ route('admin.calificaciones.index') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.calificaciones.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Calificaciones</span>
+                {{-- Postulaciones --}}
+                <div x-show="sidebarOpen" class="pt-3 pb-1">
+                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Postulaciones</p>
+                </div>
+
+                <a href="{{ route('admin.estudiantes.postulantes') }}" 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                          {{ request()->routeIs('admin.estudiantes.postulantes') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">Estudiantes</span>
+                    @php $pE = \App\Models\Estudiante::whereIn('estado_flujo', ['postulante', 'requisitos_aprobados'])->count(); @endphp
+                    @if($pE > 0)<span class="ml-auto bg-amber-400 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $pE }}</span>@endif
                 </a>
 
-                <p x-show="sidebarOpen" class="px-4 text-xs text-gray-500 uppercase tracking-wider mt-4 mb-2">Personas</p>
+                <a href="{{ route('admin.docentes.postulantes') }}" 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                          {{ request()->routeIs('admin.docentes.postulantes') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">Docentes</span>
+                    @php $pD = \App\Models\Docente::whereIn('estado_postulacion', ['pendiente', 'en_revision'])->count(); @endphp
+                    @if($pD > 0)<span class="ml-auto bg-amber-400 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $pD }}</span>@endif
+                </a>
+
+                {{-- Académico --}}
+                <div x-show="sidebarOpen" class="pt-3 pb-1">
+                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Académico</p>
+                </div>
+
+                @foreach([['route'=>'admin.materias.*','url'=>route('admin.materias.index'),'icon'=>'M12 6.253v13...','label'=>'Materias'],['route'=>'admin.grupos.*','url'=>route('admin.grupos.index'),'icon'=>'M19 11H5...','label'=>'Grupos'],['route'=>'admin.calificaciones.*','url'=>route('admin.calificaciones.index'),'icon'=>'M9 19v-6...','label'=>'Calificaciones']] as $item)
+                <a href="{{ $item['url'] }}" 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                          {{ request()->routeIs($item['route']) ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $item['icon'] }}"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">{{ $item['label'] }}</span>
+                </a>
+                @endforeach
+
+                {{-- Aprobados --}}
+                <div x-show="sidebarOpen" class="pt-3 pb-1">
+                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Aprobados</p>
+                </div>
+
                 <a href="{{ route('admin.docentes.index') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.docentes.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Docentes</span>
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                          {{ request()->routeIs('admin.docentes.*') && !request()->routeIs('admin.docentes.postulantes') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">Docentes</span>
                 </a>
+
                 <a href="{{ route('admin.estudiantes.index') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.estudiantes.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Estudiantes</span>
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                          {{ request()->routeIs('admin.estudiantes.*') && !request()->routeIs('admin.estudiantes.postulantes') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">Estudiantes</span>
                 </a>
 
-                <p x-show="sidebarOpen" class="px-4 text-xs text-gray-500 uppercase tracking-wider mt-4 mb-2">Administración</p>
-                <a href="{{ route('admin.carreras.index') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.carreras.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Carreras</span>
-                </a>
-                <a href="{{ route('admin.requisitos.index') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.requisitos.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Requisitos</span>
-                </a>
-                <a href="{{ route('admin.inscripciones.index') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.inscripciones.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Inscripciones</span>
-                </a>
+                {{-- Admin --}}
+                <div x-show="sidebarOpen" class="pt-3 pb-1">
+                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Admin</p>
+                </div>
 
-                <p x-show="sidebarOpen" class="px-4 text-xs text-gray-500 uppercase tracking-wider mt-4 mb-2">Reportes</p>
+                @foreach([['route'=>'admin.inscripciones.*','url'=>route('admin.inscripciones.index'),'icon'=>'M9 12h6...','label'=>'Inscripciones'],['route'=>'admin.carreras.*','url'=>route('admin.carreras.index'),'icon'=>'M19 21V5...','label'=>'Carreras'],['route'=>'admin.requisitos.*','url'=>route('admin.requisitos.index'),'icon'=>'M9 5H7...','label'=>'Requisitos']] as $item)
+                <a href="{{ $item['url'] }}" 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                          {{ request()->routeIs($item['route']) ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $item['icon'] }}"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">{{ $item['label'] }}</span>
+                </a>
+                @endforeach
+
+                {{-- Reportes --}}
+                <div x-show="sidebarOpen" class="pt-3 pb-1">
+                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Reportes</p>
+                </div>
+
                 <a href="{{ route('admin.reportes.postulantes') }}" 
-                   class="flex items-center gap-3 px-4 py-2.5 text-sm {{ request()->routeIs('admin.reportes.*') ? 'bg-gray-800 border-l-4 border-ficct-gold text-ficct-gold' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white' }} transition-colors">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span x-show="sidebarOpen">Reportes</span>
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                          {{ request()->routeIs('admin.reportes.*') ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span x-show="sidebarOpen" class="truncate">Reportes</span>
                 </a>
             </nav>
 
-            <!-- User + Logout -->
-            <div class="p-4 border-t border-gray-700/50">
-                <div class="flex items-center gap-2 mb-3" x-show="sidebarOpen">
-                    <div class="w-8 h-8 rounded-full bg-ficct-blue flex items-center justify-center text-sm font-bold">
+            {{-- Footer --}}
+            <div class="p-3 border-t border-gray-700/50 dark:border-gray-800">
+                <div class="flex items-center gap-2.5 px-2 mb-3" x-show="sidebarOpen">
+                    <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
                     </div>
-                    <div>
-                        <p class="text-sm font-medium truncate">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-400">Administrador</p>
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium text-white truncate">{{ auth()->user()->name }}</p>
+                        <p class="text-[10px] text-gray-400">Administrador</p>
                     </div>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-1.5">
                     <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)" 
-                            class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1.5 rounded transition-colors">
-                        <span x-show="darkMode">☀️</span>
-                        <span x-show="!darkMode">🌙</span>
+                            class="flex-1 flex items-center justify-center gap-1 px-2 py-2 text-xs font-medium text-gray-400 hover:bg-white/10 rounded-lg transition-colors">
+                        <svg x-show="!darkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        <svg x-show="darkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        <span x-show="sidebarOpen" class="text-[10px]">Tema</span>
                     </button>
                     <form method="POST" action="{{ route('logout') }}" class="flex-1">
                         @csrf
-                        <button class="w-full text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1.5 rounded transition-colors">
-                            🚪 Salir
+                        <button class="w-full flex items-center justify-center gap-1 px-2 py-2 text-xs font-medium text-red-400 hover:bg-red-500/20 rounded-lg transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            <span x-show="sidebarOpen" class="text-[10px]">Salir</span>
                         </button>
                     </form>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Bar -->
-            <div class="bg-white dark:bg-dark-surface border-b border-gray-200 dark:border-dark-border flex-shrink-0">
-                <div class="px-6 py-4 flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">@yield('title', 'Panel Admin')</h2>
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm text-gray-500">{{ now()->format('d/m/Y') }}</span>
-                        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                            <span>{{ auth()->user()->name }}</span>
-                        </div>
+        {{-- Main Content --}}
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-950">
+            <div class="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 flex-shrink-0">
+                <h1 class="text-lg font-semibold text-gray-900 dark:text-white">@yield('title', 'Panel')</h1>
+                <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                    <span>{{ now()->format('d/m/Y') }}</span>
+                    <div class="w-7 h-7 rounded-full bg-[#0f172a] flex items-center justify-center text-white text-[10px] font-bold">
+                        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
                     </div>
                 </div>
             </div>
 
-            <!-- Content -->
             <div class="flex-1 overflow-y-auto p-6">
-                <!-- Success Alert -->
                 @if(session('success'))
-                    <div x-data="{ show: true }" x-show="show" class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 text-green-800 dark:text-green-200 rounded-xl flex justify-between items-center animate-slide-in-left">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span>{{ session('success') }}</span>
-                        </div>
-                        <button @click="show = false" class="text-green-600 hover:text-green-800">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
+                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-xl flex justify-between items-center text-sm">
+                        <span>{{ session('success') }}</span>
+                        <button @click="show = false" class="text-emerald-500 hover:text-emerald-700">&times;</button>
                     </div>
                 @endif
-
-                <!-- Error Alert -->
                 @if(session('error'))
-                    <div x-data="{ show: true }" x-show="show" class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded-xl flex justify-between items-center animate-slide-in-left">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span>{{ session('error') }}</span>
-                        </div>
-                        <button @click="show = false" class="text-red-600 hover:text-red-800">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
+                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl flex justify-between items-center text-sm">
+                        <span>{{ session('error') }}</span>
+                        <button @click="show = false" class="text-red-500 hover:text-red-700">&times;</button>
                     </div>
                 @endif
-
-                <!-- Validation Errors -->
                 @if($errors->any())
-                    <div x-data="{ show: true }" x-show="show" class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded-xl animate-slide-in-left">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-semibold flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                                Errores de validación
-                            </h3>
-                            <button @click="show = false" class="text-red-600 hover:text-red-800">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <ul class="list-disc list-inside space-y-1 ml-4 text-sm">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
+                    <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl text-sm">
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
                         </ul>
                     </div>
                 @endif
