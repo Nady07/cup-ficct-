@@ -11,6 +11,9 @@ use App\Models\MateriaCup;
 use App\Models\Inscripcion;
 use App\Models\Carrera;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+
 
 class ReporteController extends Controller
 {
@@ -141,5 +144,82 @@ class ReporteController extends Controller
             ->sortByDesc('porcentaje_aprobados');
         
         return view('admin.reportes.grupos_top', compact('grupos'));
+    }
+      public function exportarPostulantesPDF()
+    {
+        $estudiantes = Estudiante::with(['carreraInteres', 'inscripcion.grupo'])
+            ->orderBy('apellidos')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.reportes.pdf.postulantes', compact('estudiantes'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('postulantes_' . date('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Exportar aprobados a PDF.
+     */
+    public function exportarAprobadosPDF()
+    {
+        $aprobados = Estudiante::whereHas('calificaciones', function($q) {
+                $q->where('estado', 'aprobado');
+            }, '=', 4)
+            ->with(['calificaciones.materia', 'inscripcion.grupo'])
+            ->orderBy('apellidos')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.reportes.pdf.aprobados', compact('aprobados'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('aprobados_' . date('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Exportar estadísticas por materia a PDF.
+     */
+    public function exportarEstadisticasPDF()
+    {
+        $materias = MateriaCup::where('estado', true)
+            ->withCount(['calificaciones as total_evaluados'])
+            ->withCount(['calificaciones as total_aprobados' => function($q) {
+                $q->where('estado', 'aprobado');
+            }])
+            ->withCount(['calificaciones as total_reprobados' => function($q) {
+                $q->where('estado', 'reprobado');
+            }])
+            ->get()
+            ->map(function($materia) {
+                $materia->promedio_notas = Calificacion::where('materia_id', $materia->id)->avg('promedio') ?? 0;
+                $materia->nota_mas_alta = Calificacion::where('materia_id', $materia->id)->max('promedio') ?? 0;
+                $materia->nota_mas_baja = Calificacion::where('materia_id', $materia->id)->min('promedio') ?? 0;
+                $materia->porcentaje_aprobados = $materia->total_evaluados > 0 
+                    ? round(($materia->total_aprobados / $materia->total_evaluados) * 100, 1) 
+                    : 0;
+                return $materia;
+            });
+
+        $pdf = Pdf::loadView('admin.reportes.pdf.estadisticas', compact('materias'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('estadisticas_materias_' . date('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Exportar grupos a PDF.
+     */
+    public function exportarGruposPDF()
+    {
+        $resumen = Grupo::resumenGrupos();
+        $grupos = Grupo::with(['docente', 'inscripciones.estudiante'])
+            ->withCount('inscripciones')
+            ->orderBy('turno')
+            ->orderBy('codigo')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.reportes.pdf.grupos', compact('resumen', 'grupos'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('grupos_' . date('Y-m-d') . '.pdf');
     }
 }

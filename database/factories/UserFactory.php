@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => fake()->randomElement(['admin', 'docente', 'estudiante']), // ← AÑADIDO
             'remember_token' => Str::random(10),
         ];
     }
@@ -39,6 +40,36 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Crear usuario con rol admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
+    }
+
+    /**
+     * Crear usuario con rol docente.
+     */
+    public function docente(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'docente',
+        ]);
+    }
+
+    /**
+     * Crear usuario con rol estudiante.
+     */
+    public function estudiante(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'estudiante',
         ]);
     }
 }

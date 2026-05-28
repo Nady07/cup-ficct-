@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\Auth;
 class EstudianteController extends Controller
 {
     /**
-     * Dashboard del estudiante
+     * Dashboard del estudiante.
+     * Muestra resumen de inscripciones, calificaciones y estado del CUP.
+     *
+     * @return \Illuminate\View\View
      */
     public function dashboard()
     {
@@ -25,37 +28,38 @@ class EstudianteController extends Controller
             abort(404, 'Estudiante no encontrado');
         }
 
-        // Datos para el dashboard
-        $inscripciones = Inscripcion::where('estudiante_id', $estudiante->id)
-            ->with(['grupo' => function ($query) {
-                $query->with('docente');
-            }])
-            ->get();
+        // Obtener inscripción activa con grupo y docente
+        $inscripcion = Inscripcion::where('estudiante_id', $estudiante->id)
+            ->with(['grupo.docente'])
+            ->latest()
+            ->first();
 
+        // Obtener calificaciones con materia
         $calificaciones = Calificacion::where('estudiante_id', $estudiante->id)
             ->with('materia')
             ->get();
 
-        // Calcular promedio
-        $promedio = $calificaciones->avg('nota') ?? 0;
-        $promedio = round($promedio, 2);
-
-        // Contar materias aprobadas
-        $aprobadas = $calificaciones->where('nota', '>=', 51)->count();
-        $reprobadas = $calificaciones->where('nota', '<', 51)->count();
+        // Usar los métodos del modelo (CORREGIDO)
+        $promedio = $estudiante->promedio();
+        $aprobadas = $estudiante->materiasAprobadas();
+        $reprobadas = $estudiante->materiasReprobadas();
+        $aproboCUP = $estudiante->aproboCUP();
 
         return view('estudiante.dashboard', compact(
             'estudiante',
-            'inscripciones',
+            'inscripcion',
             'calificaciones',
             'promedio',
             'aprobadas',
-            'reprobadas'
+            'reprobadas',
+            'aproboCUP'
         ));
     }
 
     /**
-     * Mostrar horario del estudiante
+     * Muestra el horario del estudiante según su grupo asignado.
+     *
+     * @return \Illuminate\View\View
      */
     public function horario()
     {
@@ -66,22 +70,23 @@ class EstudianteController extends Controller
             abort(404);
         }
 
-        $grupos = Grupo::whereIn('id', 
-            Inscripcion::where('estudiante_id', $estudiante->id)
-                ->where('estado', 'activa')
-                ->pluck('grupo_id')
-        )->with('docente')->get();
+        // Obtener el grupo del estudiante a través de la inscripción
+        $inscripcion = Inscripcion::where('estudiante_id', $estudiante->id)
+            ->where('estado', 'confirmado')
+            ->with('grupo.docente')
+            ->first();
 
-        // Agrupar por turno
-        $turnos = $grupos->groupBy('turno');
+        $grupo = $inscripcion ? $inscripcion->grupo : null;
 
-        return view('estudiante.horario', compact('grupos', 'turnos'));
+        return view('estudiante.horario', compact('grupo', 'inscripcion'));
     }
 
     /**
-     * Mostrar materias inscritas
+     * Muestra las calificaciones del estudiante.
+     *
+     * @return \Illuminate\View\View
      */
-    public function materias()
+    public function calificaciones()
     {
         $user = Auth::user();
         $estudiante = Estudiante::where('user_id', $user->id)->first();
@@ -90,30 +95,28 @@ class EstudianteController extends Controller
             abort(404);
         }
 
-        // Materias inscritas
-        $materias = [];
-        $inscripciones = Inscripcion::where('estudiante_id', $estudiante->id)
-            ->with('grupo')
+        $calificaciones = Calificacion::where('estudiante_id', $estudiante->id)
+            ->with('materia')
             ->get();
 
-        foreach ($inscripciones as $insc) {
-            $grupo = $insc->grupo;
-            $calificacion = Calificacion::where('estudiante_id', $estudiante->id)
-                ->where('materia_id', $grupo->materia_id ?? null)
-                ->first();
+        $promedio = $estudiante->promedio();
+        $aprobadas = $estudiante->materiasAprobadas();
+        $reprobadas = $estudiante->materiasReprobadas();
+        $aproboCUP = $estudiante->aproboCUP();
 
-            $materias[] = [
-                'inscripcion' => $insc,
-                'grupo' => $grupo,
-                'calificacion' => $calificacion,
-            ];
-        }
-
-        return view('estudiante.materias-inscritas', compact('materias'));
+        return view('estudiante.calificaciones', compact(
+            'calificaciones',
+            'promedio',
+            'aprobadas',
+            'reprobadas',
+            'aproboCUP'
+        ));
     }
 
     /**
-     * Mostrar docentes
+     * Muestra los docentes asignados al grupo del estudiante.
+     *
+     * @return \Illuminate\View\View
      */
     public function docentes()
     {
@@ -124,88 +127,33 @@ class EstudianteController extends Controller
             abort(404);
         }
 
-        // Obtener docentes de las clases inscritas
-        $docenteIds = Grupo::whereIn('id',
-            Inscripcion::where('estudiante_id', $estudiante->id)
-                ->where('estado', 'activa')
-                ->pluck('grupo_id')
-        )->pluck('docente_id')->unique();
+        // Obtener docente del grupo del estudiante
+        $inscripcion = Inscripcion::where('estudiante_id', $estudiante->id)
+            ->where('estado', 'confirmado')
+            ->with('grupo.docente')
+            ->first();
 
-        $docentes = Docente::whereIn('id', $docenteIds)
-            ->where('estado', 'activo')
-            ->get();
+        $docente = $inscripcion ? $inscripcion->grupo->docente : null;
 
-        return view('estudiante.docentes-lista', compact('docentes'));
+        return view('estudiante.docentes', compact('docente'));
     }
 
     /**
-     * Mostrar información del CUP
+     * Muestra información del CUP (materias y requisitos).
+     *
+     * @return \Illuminate\View\View
      */
     public function cup()
     {
-        $materiasCup = MateriaCup::where('estado', 'activa')
+        $materiasCup = MateriaCup::where('estado', true)
             ->orderBy('orden')
             ->get();
 
-        $requisitos = RequisitoCup::with('materia')->get();
+        $requisitos = RequisitoCup::where('tipo', 'estudiante')
+            ->where('estado', true)
+            ->orderBy('obligatorio', 'desc')
+            ->get();
 
-        // Agrupar requisitos por materia
-        $requisitosPorMateria = $requisitos->groupBy('materia_id');
-
-        return view('estudiante.cup-info', compact('materiasCup', 'requisitosPorMateria'));
+        return view('estudiante.cup-info', compact('materiasCup', 'requisitos'));
     }
-
-    public function edit(Estudiante $estudiante)
-{
-    $carreras = Carrera::where('estado', true)->get();
-    $grupos = Grupo::with('docente')->where('estado', true)->get();
-    return view('admin.estudiantes.edit', compact('estudiante', 'carreras', 'grupos'));
-}
-
-public function update(Request $request, Estudiante $estudiante)
-{
-    $validated = $request->validate([
-        'nombre' => 'required|string|max:100',
-        'apellidos' => 'required|string|max:100',
-        'ci' => 'required|string|max:20|unique:estudiantes,ci,' . $estudiante->id,
-        'email' => 'required|email|unique:estudiantes,email,' . $estudiante->id,
-        'telefono' => 'nullable|string|max:20',
-        'direccion' => 'nullable|string',
-        'fecha_nacimiento' => 'required|date',
-        'colegio_procedencia' => 'nullable|string|max:200',
-        'anio_graduacion' => 'nullable|integer',
-        'carrera_interes_id' => 'nullable|exists:carreras,id',
-        'estado' => 'boolean',
-    ]);
-
-    $estudiante->update($validated);
-
-    // Si también actualiza la inscripción
-    if ($request->filled('grupo_id')) {
-        $inscripcion = $estudiante->inscripcion;
-        if ($inscripcion) {
-            $inscripcion->update([
-                'grupo_id' => $request->grupo_id,
-                'estado' => $request->inscripcion_estado ?? $inscripcion->estado,
-                'monto_pagado' => $request->monto_pagado,
-                'numero_boleta' => $request->numero_boleta,
-            ]);
-        }
-    }
-
-    return redirect()->route('admin.estudiantes.show', $estudiante)
-        ->with('success', 'Estudiante actualizado exitosamente.');
-}
-
-public function updateRequisitos(Request $request, Estudiante $estudiante)
-{
-    $inscripcion = $estudiante->inscripcion;
-    if ($inscripcion) {
-        $inscripcion->update([
-            'requisitos_completos' => $request->requisitos_completos ?? false,
-        ]);
-    }
-
-    return back()->with('success', 'Requisitos actualizados.');
-}
 }

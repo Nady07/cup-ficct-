@@ -17,4 +17,8 @@ class RequisitoCup extends Model
     {
         return $this->belongsTo(MateriaCup::class, 'materia_id');
     }
+    protected $casts = [
+    'obligatorio' => 'boolean',
+    'estado' => 'boolean',
+    ];
 }

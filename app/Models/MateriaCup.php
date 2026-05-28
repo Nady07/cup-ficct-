@@ -22,4 +22,16 @@ class MateriaCup extends Model
     {
         return $this->hasMany(RequisitoCup::class, 'materia_id');
     }
+        protected $casts = [
+        'estado' => 'boolean',
+        'nota_minima' => 'float',
+        'valor_puntaje' => 'float',
+        'orden' => 'integer',
+    ];
+
+    // Estado legible
+    public function getEstadoLegibleAttribute(): string
+    {
+        return $this->estado ? 'Activa ✅' : 'Inactiva ❌';
+    }
 }

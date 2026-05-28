@@ -19,29 +19,29 @@
                         {{ __('Inicio') }}
                     </x-nav-link>
 
-                    {{-- MENÚ ADMIN --}}
-                    @if(auth()->check() && auth()->user()->role === 'admin')
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                            {{ __('Panel Admin') }}
+                   {{-- MENÚ ESTUDIANTE --}}
+                    @if(auth()->check() && auth()->user()->role === 'estudiante')
+                        <x-nav-link :href="route('estudiante.dashboard')" :active="request()->routeIs('estudiante.dashboard')">
+                            {{ __('Dashboard') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.materias.index')" :active="request()->routeIs('admin.materias.*')">
-                            {{ __('Materias') }}
-                        </x-nav-link>
-                    @endif
-
-                    {{-- MENÚ ESTUDIANTE --}}
-                    @if(auth()->check() && auth()->user()->role === 'student')
                         <x-nav-link :href="route('estudiante.horario')" :active="request()->routeIs('estudiante.horario')">
                             {{ __('Horario') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('estudiante.materias')" :active="request()->routeIs('estudiante.materias')">
-                            {{ __('Materias') }}
+                        <x-nav-link :href="route('estudiante.calificaciones')" :active="request()->routeIs('estudiante.calificaciones')">
+                            {{ __('Calificaciones') }}
                         </x-nav-link>
                         <x-nav-link :href="route('estudiante.docentes')" :active="request()->routeIs('estudiante.docentes')">
                             {{ __('Docentes') }}
                         </x-nav-link>
                         <x-nav-link :href="route('estudiante.cup')" :active="request()->routeIs('estudiante.cup')">
                             {{ __('CUP') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- MENÚ ADMIN --}}
+                    @if(auth()->check() && auth()->user()->role === 'admin')
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                            {{ __('Panel Admin') }}
                         </x-nav-link>
                     @endif
                 </div>

@@ -3,129 +3,89 @@
 @section('title', 'Editar Estudiante')
 
 @section('content')
-<div class="animate-fade-in">
-    <div class="mb-6">
-        <a href="{{ route('admin.estudiantes.show', $estudiante) }}" class="text-blue-600 hover:text-blue-800 flex items-center gap-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-            Volver al perfil
-        </a>
-    </div>
+<div class="max-w-4xl mx-auto space-y-4">
+    {{-- Volver --}}
+    <a href="{{ route('admin.estudiantes.show', $estudiante) }}" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Volver al perfil
+    </a>
 
-    <form action="{{ route('admin.estudiantes.update', $estudiante) }}" method="POST">
+    <form action="{{ route('admin.estudiantes.update', $estudiante) }}" method="POST" class="space-y-4">
         @csrf @method('PUT')
         
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Datos Personales -->
-            <div class="card">
-                <h3 class="text-lg font-bold mb-4">🧑 Datos Personales</h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Nombre *</label>
-                        <input type="text" name="nombre" value="{{ old('nombre', $estudiante->nombre) }}" class="input-ficct" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Apellidos *</label>
-                        <input type="text" name="apellidos" value="{{ old('apellidos', $estudiante->apellidos) }}" class="input-ficct" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">CI *</label>
-                        <input type="text" name="ci" value="{{ old('ci', $estudiante->ci) }}" class="input-ficct" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Email *</label>
-                        <input type="email" name="email" value="{{ old('email', $estudiante->email) }}" class="input-ficct" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Teléfono</label>
-                        <input type="text" name="telefono" value="{{ old('telefono', $estudiante->telefono) }}" class="input-ficct">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Fecha Nacimiento *</label>
-                        <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $estudiante->fecha_nacimiento->format('Y-m-d')) }}" class="input-ficct" required>
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium mb-1">Dirección</label>
-                        <input type="text" name="direccion" value="{{ old('direccion', $estudiante->direccion) }}" class="input-ficct">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Colegio</label>
-                        <input type="text" name="colegio_procedencia" value="{{ old('colegio_procedencia', $estudiante->colegio_procedencia) }}" class="input-ficct">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Año Graduación</label>
-                        <input type="number" name="anio_graduacion" value="{{ old('anio_graduacion', $estudiante->anio_graduacion) }}" class="input-ficct">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Carrera</label>
-                        <select name="carrera_interes_id" class="input-ficct">
-                            <option value="">Sin seleccionar</option>
-                            @foreach($carreras as $carrera)
-                                <option value="{{ $carrera->id }}" {{ $estudiante->carrera_interes_id == $carrera->id ? 'selected' : '' }}>
-                                    {{ $carrera->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Estado</label>
-                        <select name="estado" class="input-ficct">
-                            <option value="1" {{ $estudiante->estado ? 'selected' : '' }}>Activo</option>
-                            <option value="0" {{ !$estudiante->estado ? 'selected' : '' }}>Inactivo</option>
-                        </select>
-                    </div>
-                </div>
+        {{-- Datos Personales --}}
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg">
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Datos Personales</h2>
             </div>
-
-            <!-- Inscripción -->
-            <div class="card">
-                <h3 class="text-lg font-bold mb-4">📝 Inscripción CUP</h3>
-                @if($estudiante->inscripcion)
-                    @php $insc = $estudiante->inscripcion; @endphp
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Grupo</label>
-                            <select name="grupo_id" class="input-ficct">
-                                @foreach($grupos as $grupo)
-                                    <option value="{{ $grupo->id }}" {{ $insc->grupo_id == $grupo->id ? 'selected' : '' }}>
-                                        {{ $grupo->codigo }} ({{ $grupo->turno === 'M' ? 'Mañana' : ($grupo->turno === 'T' ? 'Tarde' : 'Noche') }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Estado Inscripción</label>
-                            <select name="inscripcion_estado" class="input-ficct">
-                                <option value="pendiente" {{ $insc->estado === 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                                <option value="confirmado" {{ $insc->estado === 'confirmado' ? 'selected' : '' }}>Confirmado</option>
-                                <option value="completado" {{ $insc->estado === 'completado' ? 'selected' : '' }}>Completado</option>
-                                <option value="rechazado" {{ $insc->estado === 'rechazado' ? 'selected' : '' }}>Rechazado</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Monto Pagado (Bs.)</label>
-                            <input type="number" name="monto_pagado" step="0.01" value="{{ old('monto_pagado', $insc->monto_pagado) }}" class="input-ficct">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">N° Boleta</label>
-                            <input type="text" name="numero_boleta" value="{{ old('numero_boleta', $insc->numero_boleta) }}" class="input-ficct">
-                        </div>
-                    </div>
-                @else
-                    <p class="text-gray-500 text-center py-8">El estudiante aún no tiene inscripción.</p>
-                @endif
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <x-input name="nombre" label="Nombre *" :value="old('nombre', $estudiante->nombre)" required />
+                <x-input name="apellidos" label="Apellidos *" :value="old('apellidos', $estudiante->apellidos)" required />
+                <x-input name="ci" label="CI *" :value="old('ci', $estudiante->ci)" required />
+                <x-input name="email" label="Email *" type="email" :value="old('email', $estudiante->email)" required />
+                <x-input name="telefono" label="Teléfono" :value="old('telefono', $estudiante->telefono)" />
+                <x-input name="fecha_nacimiento" label="Fecha Nacimiento *" type="date" :value="old('fecha_nacimiento', $estudiante->fecha_nacimiento->format('Y-m-d'))" required />
+                <div class="sm:col-span-2">
+                    <x-input name="direccion" label="Dirección" :value="old('direccion', $estudiante->direccion)" />
+                </div>
+                <x-input name="colegio_procedencia" label="Colegio" :value="old('colegio_procedencia', $estudiante->colegio_procedencia)" />
+                <x-input name="anio_graduacion" label="Año Graduación" type="number" :value="old('anio_graduacion', $estudiante->anio_graduacion)" />
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Carrera</label>
+                    <select name="carrera_interes_id" class="input-ficct text-xs">
+                        <option value="">Sin seleccionar</option>
+                        @foreach($carreras as $carrera)
+                            <option value="{{ $carrera->id }}" {{ $estudiante->carrera_interes_id == $carrera->id ? 'selected' : '' }}>{{ $carrera->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Estado</label>
+                    <select name="estado" class="input-ficct text-xs">
+                        <option value="1" {{ $estudiante->estado ? 'selected' : '' }}>Activo</option>
+                        <option value="0" {{ !$estudiante->estado ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <div class="flex gap-3 mt-6 justify-end">
-            <a href="{{ route('admin.estudiantes.show', $estudiante) }}" class="btn-secondary">Cancelar</a>
-            <button type="submit" class="btn-primary flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
-                </svg>
+        {{-- Inscripción --}}
+        @if($estudiante->inscripcion)
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg">
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Inscripción CUP</h2>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Grupo</label>
+                    <select name="grupo_id" class="input-ficct text-xs">
+                        @foreach($grupos as $grupo)
+                            <option value="{{ $grupo->id }}" {{ $estudiante->inscripcion->grupo_id == $grupo->id ? 'selected' : '' }}>
+                                {{ $grupo->codigo }} ({{ $grupo->turno === 'M' ? 'Mañana' : ($grupo->turno === 'T' ? 'Tarde' : 'Noche') }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Estado</label>
+                    <select name="inscripcion_estado" class="input-ficct text-xs">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="confirmado" {{ $estudiante->inscripcion->estado === 'confirmado' ? 'selected' : '' }}>Confirmado</option>
+                        <option value="rechazado" {{ $estudiante->inscripcion->estado === 'rechazado' ? 'selected' : '' }}>Rechazado</option>
+                    </select>
+                </div>
+                <x-input name="monto_pagado" label="Monto Pagado (Bs.)" type="number" :value="old('monto_pagado', $estudiante->inscripcion->monto_pagado)" />
+                <x-input name="numero_boleta" label="N° Boleta" :value="old('numero_boleta', $estudiante->inscripcion->numero_boleta)" />
+            </div>
+        </div>
+        @endif
+
+        {{-- Botones --}}
+        <div class="flex gap-2 justify-end">
+            <a href="{{ route('admin.estudiantes.show', $estudiante) }}" class="btn-secondary text-xs px-3 py-1.5">Cancelar</a>
+            <x-btn-primary :route="null" class="text-xs px-3 py-1.5">
                 Guardar Cambios
-            </button>
+            </x-btn-primary>
         </div>
     </form>
 </div>

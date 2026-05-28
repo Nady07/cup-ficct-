@@ -1,66 +1,131 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 CUP FICCT - Sistema de Administración del Curso Preuniversitario
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<div align="center">
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-12.60.2-red?style=flat-square&logo=laravel)
+![PHP](https://img.shields.io/badge/PHP-8.2-blue?style=flat-square&logo=php)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue?style=flat-square&logo=postgresql)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0-06B6D4?style=flat-square&logo=tailwindcss)
+![Alpine.js](https://img.shields.io/badge/Alpine.js-3.0-8BC0D0?style=flat-square&logo=alpine.js)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Sistema web para la administración del proceso de inscripción, evaluación y admisión universitaria**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*Facultad de Ingeniería de Ciencias de la Computación y Telecomunicaciones - UAGRM*
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+[📋 Requisitos](#-requisitos-del-sistema) · [🚀 Instalación](#-instalación) · [📊 Módulos](#-módulos) · [📈 Reportes](#-reportes) · [👨‍💻 Autor](#-autor)
 
-## Learning Laravel
+</div>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 📖 Descripción
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Aplicación web completa desarrollada en **Laravel 12** para administrar el proceso de ingreso de estudiantes al **Curso Preuniversitario (CUP)** de la FICCT. El sistema gestiona desde el registro de postulantes hasta la asignación de grupos y emisión de reportes.
 
-## Laravel Sponsors
+### 🎯 Objetivo
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+> Analizar, diseñar y desarrollar una aplicación web completa que permita administrar el proceso de inscripción, evaluación y admisión universitaria.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## ✨ Características Principales
 
-## Contributing
+### 📝 Módulo de Postulantes
+- Registro con validación de **CI único**
+- Subida y revisión de **requisitos** (título de bachiller, cédula, etc.)
+- Flujo completo: **Postulante → Requisitos ✅ → Pago 💰 → Inscrito 📚 → CUP 🎓**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 📚 Módulo Académico
+- **4 materias**: Computación, Matemáticas, Inglés, Física
+- **3 exámenes** por materia (0-100 pts)
+- **Cálculo automático** de promedio: `(Nota1 + Nota2 + Nota3) / 3`
+- **Estado automático**: APROBADO ≥ 60 | REPROBADO < 60
 
-## Code of Conduct
+### 👥 Módulo de Grupos
+- Cálculo automático: `CEIL(TotalInscritos / 80)`
+- Capacidad máxima: **70 estudiantes por grupo**
+- Asignación de docentes y horarios
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 👨‍🏫 Módulo de Docentes
+- Registro con **credenciales automáticas**
+- Gestión de requisitos (maestría, diplomado)
+- Flujo de postulación: pendiente → revisión → aprobado/rechazado
 
-## Security Vulnerabilities
+### 📊 Dashboard y Reportes
+- **KPIs**: total inscritos, aprobados, reprobados, grupos habilitados
+- **Reportes**: postulantes, promedios, estadísticas por materia, grupos
+- **Exportación PDF** de todos los reportes
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 🎨 Interfaz
+- **Modo oscuro** nativo
+- **Diseño responsive** (TailwindCSS)
+- **Componentes Blade** reutilizables
+- **Buscador inteligente** con Alpine.js (debounce 300ms)
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🛠️ Stack Tecnológico
+
+| Tecnología | Versión | Uso |
+|------------|---------|-----|
+| **Laravel** | 12.60.2 | Framework PHP backend |
+| **PHP** | 8.2+ | Lenguaje de programación |
+| **PostgreSQL** | 15+ | Base de datos relacional |
+| **TailwindCSS** | 3.x | Framework CSS utilitario |
+| **Alpine.js** | 3.x | Framework JS reactivo |
+| **Vite** | 5.x | Bundler de assets |
+| **Laravel Breeze** | 2.x | Autenticación |
+| **DomPDF** | 3.x | Exportación de reportes PDF |
+
+---
+
+## 📋 Requisitos del Sistema
+
+- ✅ PHP 8.2 o superior
+- ✅ Composer 2.x
+- ✅ Node.js 18+ y NPM
+- ✅ PostgreSQL 15+
+- ✅ Extensiones PHP: `pgsql`, `fileinfo`, `mbstring`, `gd`
+
+---
+
+## 🚀 Instalación
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/Nady07/cup-ficct-.git
+cd cup-ficct-uagrm
+
+# 2. Instalar dependencias PHP
+composer install
+
+# 3. Instalar dependencias Node
+npm install
+
+# 4. Configurar entorno
+cp .env.example .env
+
+# 5. Editar .env con tus credenciales
+# DB_CONNECTION=pgsql
+# DB_HOST=127.0.0.1
+# DB_PORT=5432
+# DB_DATABASE=cup_ficct
+# DB_USERNAME=postgres
+# DB_PASSWORD=tu_password
+
+# 6. Generar application key
+php artisan key:generate
+
+# 7. Migrar base de datos
+php artisan migrate
+
+# 8. Crear usuarios de prueba (opcional)
+php artisan tinker
+User::create(['name'=>'Administrador','email'=>'admin@cup.ficct.edu.bo','password'=>bcrypt('admin123'),'role'=>'admin']);
+exit
+
+# 9. Compilar assets
+npm run build
+
+# 10. Iniciar servidor
+php artisan serve

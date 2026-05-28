@@ -3,274 +3,209 @@
 @section('title', 'Perfil del Estudiante')
 
 @section('content')
-<div class="animate-fade-in">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+<div class="space-y-4">
+    {{-- Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-            <a href="{{ route('admin.estudiantes.index') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 flex items-center gap-1 mb-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-                Volver a estudiantes
+            <a href="{{ route('admin.estudiantes.index') }}" class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 flex items-center gap-1 mb-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Volver
             </a>
-            <h2 class="text-2xl font-bold">{{ $estudiante->nombreCompleto() }}</h2>
-            <p class="text-sm text-gray-500">CI: {{ $estudiante->ci }}</p>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ $estudiante->nombreCompleto() }}</h1>
+            <p class="text-xs text-gray-500">CI: {{ $estudiante->ci }}</p>
         </div>
-        <div class="flex gap-2">
-            <a href="{{ route('admin.estudiantes.edit', $estudiante) }}" class="btn-primary flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-                Editar Estudiante
-            </a>
+        <a href="{{ route('admin.estudiantes.edit', $estudiante) }}" class="btn-primary text-xs px-3 py-1.5 inline-flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Editar
+        </a>
+    </div>
+
+    {{-- ══════════════════════════════════════ --}}
+    {{-- BARRA DE PROGRESO DEL FLUJO (NUEVO) --}}
+    {{-- ══════════════════════════════════════ --}}
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Progreso del Postulante</h3>
+        
+        @php
+            $pasos = [
+                'postulante'           => ['label' => 'Postulante',       'icon' => '📝'],
+                'requisitos_aprobados' => ['label' => 'Requisitos ✅',    'icon' => '📋'],
+                'pago_confirmado'      => ['label' => 'Pago 💰',         'icon' => '💳'],
+                'inscrito'             => ['label' => 'Inscrito 📚',     'icon' => '🏫'],
+                'cup_aprobado'         => ['label' => 'CUP 🎓',          'icon' => '🎉'],
+            ];
+            $claves = array_keys($pasos);
+            $actual = array_search($estudiante->estado_flujo ?? 'postulante', $claves);
+            if ($actual === false) $actual = 0;
+        @endphp
+        
+        <div class="flex items-center gap-1">
+            @foreach($pasos as $key => $paso)
+                @php $i = array_search($key, $claves); @endphp
+                <div class="flex-1 text-center">
+                    <div class="w-7 h-7 mx-auto rounded-full text-xs flex items-center justify-center font-bold
+                        {{ $i <= $actual ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
+                        {{ $i + 1 }}
+                    </div>
+                    <p class="text-[9px] mt-1 {{ $i <= $actual ? 'text-green-600 dark:text-green-400 font-medium' : 'text-gray-400' }}">
+                        {{ $paso['icon'] }}<br>{{ $paso['label'] }}
+                    </p>
+                </div>
+                @if(!$loop->last)
+                    <div class="w-3 h-0.5 mt-[-12px] {{ $i < $actual ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700' }}"></div>
+                @endif
+            @endforeach
+        </div>
+
+        {{-- Botones de acción según estado --}}
+        <div class="mt-3 flex flex-wrap gap-2">
+            @if($estudiante->estado_flujo === 'postulante' && $estudiante->requisitos_completos)
+                <form action="{{ route('admin.estudiantes.aprobarRequisitos', $estudiante) }}" method="POST">
+                    @csrf @method('PATCH')
+                    <button class="btn-primary text-xs px-3 py-1.5">✅ Aprobar Requisitos</button>
+                </form>
+            @endif
+            
+            @if($estudiante->estado_flujo === 'requisitos_aprobados')
+                <form action="{{ route('admin.estudiantes.confirmarPago', $estudiante) }}" method="POST">
+                    @csrf @method('PATCH')
+                    <button class="btn-primary text-xs px-3 py-1.5">💳 Confirmar Pago</button>
+                </form>
+            @endif
+            
+            {{-- Marcar requisitos como completos --}}
+            @if(!$estudiante->requisitos_completos)
+                <form action="{{ route('admin.estudiantes.updateRequisitos', $estudiante) }}" method="POST" class="inline">
+                    @csrf @method('PATCH')
+                    <input type="hidden" name="requisitos_completos" value="1">
+                    <button class="btn-secondary text-xs px-3 py-1.5">📋 Marcar Requisitos Completos</button>
+                </form>
+            @else
+                <form action="{{ route('admin.estudiantes.updateRequisitos', $estudiante) }}" method="POST" class="inline">
+                    @csrf @method('PATCH')
+                    <input type="hidden" name="requisitos_completos" value="0">
+                    <button class="btn-secondary text-xs px-3 py-1.5">❌ Desmarcar Requisitos</button>
+                </form>
+            @endif
         </div>
     </div>
 
-    <!-- Estado General del CUP -->
-    <div class="card mb-6 {{ $aprobadoCUP ? 'border-l-4 border-green-500' : 'border-l-4 border-yellow-500' }}">
+    {{-- Estado General del CUP --}}
+    <div class="bg-white dark:bg-gray-900 border rounded-lg p-4 {{ $aprobadoCUP ? 'border-green-500' : 'border-yellow-500' }}">
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-16 h-16 rounded-full flex items-center justify-center {{ $aprobadoCUP ? 'bg-green-100' : 'bg-yellow-100' }}">
-                    <span class="text-3xl">{{ $aprobadoCUP ? '🎓' : '📚' }}</span>
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center {{ $aprobadoCUP ? 'bg-green-100 dark:bg-green-900/30' : 'bg-yellow-100 dark:bg-yellow-900/30' }}">
+                    <span class="text-2xl">{{ $aprobadoCUP ? '🎓' : '📚' }}</span>
                 </div>
                 <div>
-                    <h3 class="text-xl font-bold">
-                        {{ $aprobadoCUP ? '¡CUP APROBADO!' : 'CUP EN CURSO' }}
-                    </h3>
-                    <p class="text-sm text-gray-500">
-                        {{ $aprobadas }} de {{ $totalMaterias }} materias aprobadas ({{ $porcentajeCompletado }}%)
-                    </p>
+                    <h3 class="text-lg font-bold">{{ $aprobadoCUP ? '¡CUP APROBADO!' : 'CUP EN CURSO' }}</h3>
+                    <p class="text-xs text-gray-500">{{ $aprobadas }} de {{ $totalMaterias }} materias ({{ $porcentajeCompletado }}%)</p>
                 </div>
             </div>
             <div class="text-right">
-                <p class="text-3xl font-bold {{ $promedio >= 60 ? 'text-green-600' : 'text-red-600' }}">
-                    {{ number_format($promedio, 1) }}
-                </p>
-                <p class="text-sm text-gray-500">Promedio general</p>
+                <p class="text-2xl font-bold {{ $promedio >= 60 ? 'text-green-600' : 'text-red-600' }}">{{ number_format($promedio, 1) }}</p>
+                <p class="text-xs text-gray-500">Promedio</p>
             </div>
         </div>
-        <div class="mt-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-            <div class="h-3 rounded-full transition-all {{ $porcentajeCompletado >= 100 ? 'bg-green-500' : ($porcentajeCompletado >= 50 ? 'bg-yellow-500' : 'bg-blue-500') }}" 
+        <div class="mt-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div class="h-2 rounded-full {{ $porcentajeCompletado >= 100 ? 'bg-green-500' : ($porcentajeCompletado >= 50 ? 'bg-yellow-500' : 'bg-blue-500') }}" 
                  style="width: {{ $porcentajeCompletado }}%"></div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Columna 1: Datos Personales -->
-        <div class="card">
-            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-                Datos Personales
-            </h3>
-            <div class="space-y-3">
-                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
-                    <span class="text-gray-500">Nombre completo</span>
+    {{-- Grid: Datos + Inscripción + Carrera --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {{-- Datos Personales --}}
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Datos Personales</h3>
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                    <span class="text-gray-500">Nombre</span>
                     <span class="font-medium text-right">{{ $estudiante->nombreCompleto() }}</span>
                 </div>
-                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
+                <div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
                     <span class="text-gray-500">CI</span>
                     <span class="font-mono">{{ $estudiante->ci }}</span>
                 </div>
-                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
-                    <span class="text-gray-500">Fecha Nacimiento</span>
+                <div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                    <span class="text-gray-500">Nacimiento</span>
                     <span>{{ $estudiante->fecha_nacimiento->format('d/m/Y') }}</span>
                 </div>
-                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
+                <div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
                     <span class="text-gray-500">Email</span>
-                    <span class="text-sm">{{ $estudiante->email }}</span>
+                    <span>{{ $estudiante->email }}</span>
                 </div>
-                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
+                <div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
                     <span class="text-gray-500">Teléfono</span>
-                    <span>{{ $estudiante->telefono ?? 'No registrado' }}</span>
+                    <span>{{ $estudiante->telefono ?? '—' }}</span>
                 </div>
-                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
-                    <span class="text-gray-500">Dirección</span>
-                    <span class="text-sm text-right">{{ $estudiante->direccion ?? 'No registrada' }}</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
+                <div class="flex justify-between py-1.5">
                     <span class="text-gray-500">Colegio</span>
-                    <span class="text-sm text-right">{{ $estudiante->colegio_procedencia ?? 'No registrado' }}</span>
-                </div>
-                <div class="flex justify-between py-2">
-                    <span class="text-gray-500">Año Graduación</span>
-                    <span>{{ $estudiante->anio_graduacion ?? 'No registrado' }}</span>
+                    <span>{{ $estudiante->colegio_procedencia ?? '—' }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- Columna 2: Inscripción al CUP -->
-        <div class="card">
-            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Inscripción CUP I/2025
-            </h3>
+        {{-- Inscripción --}}
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Inscripción CUP</h3>
             @if($estudiante->inscripcion)
-                @php $insc = $estudiante->inscripcion; @endphp
-                <div class="space-y-3">
-                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
                         <span class="text-gray-500">Estado</span>
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold
-                            {{ $insc->estado === 'confirmado' ? 'bg-green-100 text-green-800' : 
-                               ($insc->estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 
-                               ($insc->estado === 'completado' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800')) }}">
-                            {{ ucfirst($insc->estado) }}
-                        </span>
+                        <x-badge :color="match($estudiante->inscripcion->estado){'confirmado'=>'green','pendiente'=>'yellow',default=>'gray'}">
+                            {{ ucfirst($estudiante->inscripcion->estado) }}
+                        </x-badge>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
+                    <div class="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
                         <span class="text-gray-500">Grupo</span>
-                        <span class="font-bold font-mono">{{ $insc->grupo->codigo ?? 'No asignado' }}</span>
+                        <span class="font-mono font-bold">{{ $estudiante->inscripcion->grupo->codigo ?? '—' }}</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
-                        <span class="text-gray-500">Turno</span>
-                        <span>{{ $insc->grupo->turno ?? '-' === 'M' ? '🌅 Mañana' : ($insc->grupo->turno ?? '-' === 'T' ? '☀️ Tarde' : '🌙 Noche') }}</span>
-                    </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
-                        <span class="text-gray-500">Horario</span>
-                        <span>{{ isset($insc->grupo) ? \Carbon\Carbon::parse($insc->grupo->horario_inicio)->format('H:i') . ' - ' . \Carbon\Carbon::parse($insc->grupo->horario_fin)->format('H:i') : 'N/A' }}</span>
-                    </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
-                        <span class="text-gray-500">Modalidad</span>
-                        <span class="badge-ficct">{{ $insc->grupo->modalidad ?? 'Presencial' }}</span>
-                    </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
+                    <div class="flex justify-between py-1.5">
                         <span class="text-gray-500">Docente</span>
-                        <span class="text-sm">{{ $insc->grupo->docente->nombreCompleto ?? $insc->grupo->docente->apellidos ?? 'Sin asignar' }}</span>
-                    </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
-                        <span class="text-gray-500">Fecha Inscripción</span>
-                        <span>{{ $insc->fecha_inscripcion }}</span>
-                    </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-dark-border">
-                        <span class="text-gray-500">Monto Pagado</span>
-                        <span class="font-bold">Bs. {{ number_format($insc->monto_pagado ?? 0, 2) }}</span>
-                    </div>
-                    <div class="flex justify-between py-2">
-                        <span class="text-gray-500">Boleta N°</span>
-                        <span class="font-mono text-sm">{{ $insc->numero_boleta ?? 'N/A' }}</span>
+                        <span>{{ $estudiante->inscripcion->grupo->docente->nombreCompleto ?? '—' }}</span>
                     </div>
                 </div>
             @else
-                <div class="text-center py-8">
-                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <p class="text-gray-500">No está inscrito en el CUP</p>
-                </div>
+                <p class="text-xs text-gray-400 text-center py-4">No inscrito</p>
             @endif
         </div>
 
-        <!-- Columna 3: Carrera y Requisitos -->
-        <div class="space-y-6">
-            <!-- Carrera -->
-            <div class="card">
-                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                    </svg>
-                    Carrera de Interés
-                </h3>
-                @if($estudiante->carreraInteres)
-                    <div class="p-3 bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20 rounded-lg">
-                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-mono font-bold">
-                            {{ $estudiante->carreraInteres->codigo }}
-                        </span>
-                        <p class="font-bold mt-2">{{ $estudiante->carreraInteres->nombre }}</p>
-                        <p class="text-sm text-gray-500 mt-1">{{ $estudiante->carreraInteres->duracion }}</p>
-                    </div>
-                @else
-                    <p class="text-gray-500">No ha seleccionado carrera.</p>
-                @endif
-            </div>
-
-            <!-- Requisitos -->
-            <div class="card">
-                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    Documentos / Requisitos
-                </h3>
-                @if($requisitosCompletados)
-                    <div class="p-3 bg-green-50 dark:bg-green-900 dark:bg-opacity-20 rounded-lg flex items-center gap-2">
-                        <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="font-bold text-green-800">Todos los requisitos completos</span>
-                    </div>
-                @else
-                    <div class="p-3 bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20 rounded-lg flex items-center gap-2">
-                        <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="font-bold text-yellow-800">Requisitos pendientes</span>
-                    </div>
-                @endif
-            </div>
+        {{-- Carrera --}}
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Carrera</h3>
+            @if($estudiante->carreraInteres)
+                <span class="inline-flex px-2 py-0.5 rounded text-xs font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                    {{ $estudiante->carreraInteres->codigo }}
+                </span>
+                <p class="text-sm font-medium mt-1">{{ $estudiante->carreraInteres->nombre }}</p>
+                <p class="text-xs text-gray-500">{{ $estudiante->carreraInteres->duracion }}</p>
+            @else
+                <p class="text-xs text-gray-400">No definida</p>
+            @endif
         </div>
     </div>
 
-    <!-- Materias y Calificaciones -->
-    <div class="card mt-6">
-        <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
-            Materias del CUP ({{ $aprobadas }}/{{ $totalMaterias }} aprobadas)
-        </h3>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {{-- Calificaciones --}}
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Calificaciones ({{ $aprobadas }}/{{ $totalMaterias }})</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             @foreach($materias as $materia)
-                @php
-                    $calificacion = $estudiante->calificaciones->where('materia_id', $materia->id)->first();
-                @endphp
-                <div class="p-4 rounded-lg border {{ $calificacion ? ($calificacion->estado === 'aprobado' ? 'border-green-300 bg-green-50 dark:bg-green-900 dark:bg-opacity-10' : 'border-red-300 bg-red-50 dark:bg-red-900 dark:bg-opacity-10') : 'border-gray-200 bg-gray-50 dark:bg-dark-surface' }}">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-bold text-lg">{{ $materia->nombre }}</h4>
-                            <p class="text-xs text-gray-500">{{ $materia->codigo }} • Nota mínima: {{ $materia->nota_minima }}</p>
-                            <p class="text-xs text-gray-400">Vale {{ $materia->valor_puntaje }} puntos</p>
-                        </div>
-                        <div class="text-right">
-                            @if($calificacion)
-                                <p class="text-3xl font-bold {{ $calificacion->nota >= $materia->nota_minima ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ $calificacion->nota }}
-                                </p>
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $calificacion->estado === 'aprobado' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $calificacion->estado === 'aprobado' ? '✅ Aprobado' : '❌ Reprobado' }}
-                                </span>
-                                <p class="text-xs text-gray-400 mt-1">Registrado por: {{ $calificacion->registradoPor->name ?? 'Sistema' }}</p>
-                            @else
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
-                                    ⏳ Pendiente
-                                </span>
-                            @endif
-                        </div>
+                @php $cal = $estudiante->calificaciones->where('materia_id', $materia->id)->first(); @endphp
+                <div class="p-3 rounded-lg border text-xs {{ $cal ? ($cal->estado === 'aprobado' ? 'border-green-200 bg-green-50 dark:bg-green-950/20' : 'border-red-200 bg-red-50 dark:bg-red-950/20') : 'border-gray-200 bg-gray-50 dark:bg-gray-800/50' }}">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">{{ $materia->nombre }}</span>
+                        @if($cal)
+                            <span class="font-bold {{ $cal->estado === 'aprobado' ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $cal->promedio_formateado }}
+                            </span>
+                        @else
+                            <span class="text-gray-400">—</span>
+                        @endif
                     </div>
-                    @if($calificacion)
-                        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-                            <div class="h-2 rounded-full {{ $calificacion->nota >= $materia->nota_minima ? 'bg-green-500' : 'bg-red-500' }}" 
-                                 style="width: {{ min($calificacion->nota, 100) }}%"></div>
-                        </div>
-                    @endif
                 </div>
             @endforeach
         </div>
-
-        @if($aprobadoCUP)
-            <div class="mt-6 p-4 bg-green-100 dark:bg-green-900 dark:bg-opacity-20 rounded-lg text-center">
-                <p class="text-xl font-bold text-green-800 dark:text-green-200">🎓 ¡Felicidades! El estudiante ha APROBADO el CUP</p>
-                <p class="text-sm text-green-600 dark:text-green-300">Promedio final: {{ number_format($promedio, 1) }} puntos</p>
-            </div>
-        @elseif($reprobadas > 0)
-            <div class="mt-6 p-4 bg-yellow-100 dark:bg-yellow-900 dark:bg-opacity-20 rounded-lg text-center">
-                <p class="text-lg font-bold text-yellow-800 dark:text-yellow-200">⚠️ Atención: Tiene {{ $reprobadas }} materia(s) reprobada(s)</p>
-                <p class="text-sm text-yellow-600 dark:text-yellow-300">Necesita aprobar todas las materias con nota ≥ 60</p>
-            </div>
-        @endif
     </div>
 </div>
 @endsection

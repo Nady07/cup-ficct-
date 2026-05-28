@@ -16,11 +16,14 @@ class DocenteController extends Controller
 public function index(Request $request)
 {
     $query = Docente::with('grupos')
-        ->withCount('grupos')
-        ->where('estado_postulacion', 'aprobado')  //  SOLO APROBADOS
-        ->where('estado', true)                      //  ACTIVOS
-        ->orderBy('apellidos');
+        ->withCount('grupos');
 
+    // Filtro opcional por estado de postulación (admin ve todos)
+    if ($request->filled('estado_postulacion')) {
+        $query->where('estado_postulacion', $request->estado_postulacion);
+    }
+
+    // Filtro de búsqueda
     if ($request->filled('buscar')) {
         $buscar = strtolower($request->buscar);
         $query->where(function($q) use ($buscar) {
@@ -31,9 +34,14 @@ public function index(Request $request)
         });
     }
 
-    $docentes = $query->paginate(10)->appends($request->query());
+    $docentes = $query->orderBy('apellidos')
+        ->paginate(10)
+        ->appends($request->query());
 
-    return view('admin.docentes.index', compact('docentes'));
+    // Pasar los estados posibles para los filtros de la vista
+    $estadosPostulacion = ['pendiente', 'en_revision', 'aprobado', 'rechazado'];
+
+    return view('admin.docentes.index', compact('docentes', 'estadosPostulacion'));
 }
 
     public function create()
